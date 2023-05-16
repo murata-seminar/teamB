@@ -1,8 +1,10 @@
-//----エンティティ関連の関数 ----------------------------------------------
 function updatePosition(entity) {
   entity.x += entity.vx;
   entity.y += entity.vy;
 }
+
+
+
 function createBlock(y) {
   return {
     x:900 ,
@@ -14,6 +16,7 @@ function createBlock(y) {
 
 
 function drawBlock(entity) {
+ 
   rect(entity.x, entity.y, 100, 400);
 }
 function blockIsAlive(entity) {
@@ -26,7 +29,6 @@ function blockIsAlive(entity) {
 let playerX = 30;
 let playerY = 250;
 let blocks;
-//----ゲーム全体に関わる部分 ----------------------------------------------
 
 function addBlockPair() {
   let y = random(-300, -100);
@@ -34,22 +36,21 @@ function addBlockPair() {
   //blocks.push(createBlock(y));
   blocks.push(createBlock(y + 600)); // 下のブロック
 }
-//
-//----setup/draw 他 ------------------------------------------------------
 
 function setup() {
-  createCanvas(800, 600); // 800 x 600 ピクセル。今回このサイズでやっていきます
-  rectMode(CENTER); //四角形の基準点を中心に変更
+  createCanvas(400, 400);
   blocks = [];
-  //（ここに初期化処理が入る）
-
+  
 }
 
+
 function draw() {
-  //（ここにデータ操作処理が入る）
+  background(220);
   fill(0);
   rect(playerX, playerY, 20, 20 );
   
+  
+   // ブロックの追加と削除
   if (frameCount % 120 === 1) addBlockPair(blocks); // 一定間隔で追加
   blocks = blocks.filter(blockIsAlive); // 生きているブロックだけ残す
   //updatePosition(player);
@@ -59,8 +60,11 @@ function draw() {
   for (let block of blocks) drawBlock(block);
 
 
+ 
 }
 
-function mousePressed(){
-  //（ここにマウスボタンを押したときの処理が入る）
-}
+
+
+
+
+  
