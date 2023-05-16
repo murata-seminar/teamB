@@ -30,6 +30,22 @@ let playerX = 30;
 let playerY = 250;
 let blocks;
 
+let record;
+let i=0;
+
+
+function timer(){
+  record = Math.floor(i/60);
+    
+  noStroke();
+  fill(0);
+  textSize(100);
+  textAlign(CENTER, CENTER);
+  text(record, 50, 50);
+  i += 1
+}
+
+
 function addBlockPair() {
   let y = random(-300, -100);
   
@@ -48,7 +64,7 @@ function draw() {
   background(220);
   fill(0);
   rect(playerX, playerY, 20, 20 );
-  
+  timer();
   
    // ブロックの追加と削除
   if (frameCount % 120 === 1) addBlockPair(blocks); // 一定間隔で追加
