@@ -1,0 +1,154 @@
+let playerImages = []; // プレイヤーの画像配列
+let currentImageIndex = 0; // 現在の画像のインデックス
+let gameState = "start";
+
+function drawStartScreen() {
+  background(0);
+  textAlign(CENTER);
+  fill(255);
+  textSize(32);
+  text("Enter Start", width / 2, height / 2);
+  imageMode(CENTER);
+  image(playerImages[currentImageIndex], width / 2, height / 2 + 50, 80, 60);
+}
+
+function drawGameOverScreen() {
+  background(0);
+  textAlign(CENTER);
+  fill(255);
+  textSize(32);
+  text("Game Over", width / 2, height / 2 - 50);
+  textSize(20);
+  text("Press Enter for Retry", width / 2, height / 2 + 20);
+  text("Press Esc for Main Menu", width / 2, height / 2 + 50);
+}
+
+function checkGameOver() {
+  if (player.y > height) {
+    gameState = "gameover";
+  }
+}
+
+function preload() {
+  // 画像をロード
+  playerImages.push(loadImage('uma.png'));
+  playerImages.push(loadImage('kame.png'));
+  playerImages.push(loadImage('chi-ta-.png'));
+  playerImages.push(loadImage('neko.png'));
+}
+
+function updatePosition(entity) {
+  entity.x += entity.vx;
+  entity.y += entity.vy;
+}
+
+function createPlayer() {
+  return {
+    x: 200,
+    y: 300,
+    vx: 0,
+    vy: 0,
+    jumping: false, // ジャンプ中かどうかを示すフラグ
+    rotation: 0, // 回転角度を示す変数
+  };
+}
+
+function applyGravity(entity) {
+  entity.vy += 0.15;
+}
+
+function applyJump(entity) {
+  entity.vy = -10;
+  entity.jumping = true; // ジャンプ中フラグをtrueに設定
+  entity.rotation = 0; // 回転角度をリセット
+}
+
+function drawPlayer(entity) {
+  if (entity.jumping) {
+    // ジャンプ中は斜めに描写され、少しずつ回転する
+    push();
+    translate(entity.x, entity.y);
+    if (entity.vy < 0) {
+      rotate(radians(-30));
+    } else {
+      rotate(radians(30));
+    }
+    image(playerImages[currentImageIndex], 0, 0, 80, 60); // 画像を描画
+    pop();
+
+    // 回転角度を更新
+    if (entity.vy < 0 && entity.rotation < 120) {
+      entity.rotation += 1;
+    } else if (entity.vy >= 0 && entity.rotation > -120) {
+      entity.rotation -= 1;
+    }
+  } else {
+    // ジャンプ中でない場合は通常の描画
+    imageMode(CENTER);
+    image(playerImages[currentImageIndex], entity.x, entity.y, 80, 60); // 画像を描画
+  }
+}
+
+let player;
+
+function setup() {
+  createCanvas(800, 600);
+  rectMode(CENTER);
+  player = createPlayer();
+}
+
+function draw() {
+  if (gameState === "start") {
+    drawStartScreen();
+  } else if (gameState === "game") {
+    updatePosition(player);
+    applyGravity(player);
+    background(255);
+    drawPlayer(player);
+    checkGameOver();
+  } else if (gameState === "gameover") {
+    drawGameOverScreen();
+  }
+}
+
+function keyPressed() {
+  if (keyCode === ENTER) {
+    if (gameState === "start" || gameState === "gameover") {
+      gameState = "game";
+      resetGame();
+    }
+  } else if (keyCode === ESCAPE) {
+    if (gameState === "gameover") {
+      gameState = "start";
+    }
+  } else if (keyCode === LEFT_ARROW && gameState === "start") {
+    previousImage();
+  } else if (keyCode === RIGHT_ARROW && gameState === "start") {
+    nextImage();
+  }
+}
+
+function resetGame() {
+  player = createPlayer();
+}
+
+function mousePressed() {
+  if (gameState === "game") {
+    applyJump(player);
+  }
+}
+
+function previousImage() {
+  currentImageIndex--;
+  if (currentImageIndex < 0) {
+    currentImageIndex = playerImages.length - 1;
+  }
+}
+
+
+function nextImage() {
+  currentImageIndex++;
+  if (currentImageIndex >= playerImages.length) {
+    currentImageIndex = 0;
+  }
+}
