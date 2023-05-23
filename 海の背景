@@ -1,0 +1,62 @@
+function updatePosition(entity) {
+  entity.x += entity.vx;
+  entity.y += entity.vy;
+}
+let beachImg;
+let treeImg;
+let sunImg;
+let cloudImg;
+let clouds=[];
+
+
+
+function preload() {
+  beachImg=loadImage('beach.jpeg');
+  treeImg = loadImage('tree.png');
+  sunImg=loadImage('sun2.png')
+  cloudImg=loadImage('img2470.png')
+}
+
+function createCloud(y){
+  return{
+    x:900,
+    y,
+    vx:-0.5,
+    vy:0
+  };
+}
+
+function drawCloud(entity){
+  image(cloudImg,entity.x,entity.y,100,100);
+}
+function cloudIsAlive(entity){
+  return -100<entity.x;
+}
+
+function addcloud(){
+  let y=random(10,150);
+  clouds.push(createCloud(y));
+}
+
+function sea(){
+  
+  image(beachImg,0,0,800,600)
+  
+  image(sunImg,700,10,150,150);
+  
+  
+ 
+}
+
+function setup() {
+  createCanvas(800, 600);
+  clouds=[];
+}
+
+function draw() {
+  sea();
+  if(frameCount % 350 === 1)addcloud(clouds);
+  clouds=clouds.filter(cloudIsAlive);
+  for (let cloud of clouds) updatePosition(cloud);
+  for (let cloud of clouds) drawCloud(cloud);
+}
