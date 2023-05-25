@@ -1,7 +1,7 @@
 // プレイヤーの関数
 let playerImages = []; // プレイヤーの画像配列
 let currentImageIndex = 0; // 現在の画像のインデックス
-
+let player;
 // タイマーの関数
 let record;
 let t = 0;
@@ -121,11 +121,74 @@ function checkGameOver() {
   }
 }
 
+// プレイヤーとブロックの当たり判定
+function checkCollision(player, block) {
+  if (
+    player.x + 40 > block.posX - block.sizeX / 2 &&
+    player.x - 40 < block.posX + block.sizeX / 2 &&
+    player.y + 30 > block.posY - block.sizeY / 2 &&
+    player.y - 30 < block.posY + block.sizeY / 2
+  ) {
+    return true;
+  }
+  return false;
+}
+
+function checkLanding(player, block) {
+  if (
+    player.y + 30 >= block.posY - block.sizeY / 2 &&
+    player.y + 30 <= block.posY + block.sizeY / 2 &&
+    player.x + 40 > block.posX - block.sizeX / 2 &&
+    player.x - 40 < block.posX + block.sizeX / 2
+  ) {
+    return true;
+  }
+  return false;
+}
+
 // プレイヤーの場所更新
 function updatePosition(entity) {
-  entity.x += entity.vx;
-  entity.y += entity.vy;
+  if(entity.loading == false) {
+    entity.x += entity.vx;
+    entity.y += entity.vy;
+  } else {
+    entity.x = 200, 
+    entity.y = 200
+  }
+
+  if (entity.y >= height) {
+    if (gameState === "game") {
+      gameState = "gameover";
+    }
+  }
+
+  // ブロックとの当たり判定
+  for (let i = 0; i < blocks.length; i++) {
+    if (checkCollision(entity, blocks[i])) {
+      if (entity.vy > 0) {
+        entity.vy = 0;
+        entity.jumping = false;
+      }
+    }
+  }
+
+  // ブロックの一番上に着地したかの判定
+  let highestBlock = null;
+  for (let i = 0; i < blocks.length; i++) {
+    if (checkLanding(entity, blocks[i])) {
+      if (!highestBlock || blocks[i].posY < highestBlock.posY) {
+        highestBlock = blocks[i];
+      }
+    }
+  }
+
+  if (highestBlock) {
+    entity.y = highestBlock.posY - highestBlock.sizeY / 2 - 30;
+    entity.vy = 0;
+    entity.jumping = false;
+  }
 }
+
 
 // プレイヤー作成
 function createPlayer() {
@@ -135,21 +198,38 @@ function createPlayer() {
     vx: 0,
     vy: 0,
     jumping: false, // ジャンプ中かどうかを示すフラグ
+    loading: false, //　最初待っているかどうか
     rotation: 0, // 回転角度を示す変数
   };
 }
 
 // 重力
 function applyGravity(entity) {
-  entity.vy += 0.15;
+  if(entity.loading == false){
+    entity.vy += 0.15;
+  }
 }
 
 // ジャンプ
 function applyJump(entity) {
-  entity.vy = -10;
+  entity.vy = -5;
   entity.jumping = true; // ジャンプ中フラグをtrueに設定
   entity.rotation = 0; // 回転角度をリセット
 }
+
+
+//判定
+function judgement(entity) {
+  for(let i = 0; i < blocks.length; i++) {
+    if(blocks[i].posX - blocks[i].sizeX < entity.x && blocks[i].posX + blocks[i].sizeX > entity.x) {
+      if(blocks[i].posY - blocks[i].sizeY / 2 < entity.y) {
+        entity.y = blocks[i].posY - blocks[i].sizeY / 2;
+        entity.vy = 0;
+      }
+    }
+  }
+}
+
 
 // プレイヤー描画
 function drawPlayer(entity) {
@@ -171,10 +251,18 @@ function drawPlayer(entity) {
 }
 
 
-let player;
-
 // タイマー
-function timer() {
+function timer(entity) {
+  if(frameCount < 420) {
+    entity.loading = true;
+    record = 6 - Math.floor(frameCount / 60);
+    noStroke();
+    fill(0);
+    textSize(100);
+    textAlign(CENTER, CENTER);
+    text(record, 50, 50);
+  } else {
+    entity.loading = false;
   record = Math.floor(t / 60);
 
   noStroke();
@@ -183,6 +271,7 @@ function timer() {
   textAlign(CENTER, CENTER);
   text(record, 50, 50);
   t += 1
+}
 }
 
 // リセット
@@ -250,11 +339,12 @@ function draw() {
   if (gameState === "start") {
     drawStartScreen();
   } else if (gameState === "game") {
+    judgement(player);
     updatePosition(player);
     applyGravity(player);
     drawPlayer(player);
     checkGameOver();
-    timer();
+    timer(player);
     //ブロックの追加
     intarval = 100;
     if (frameCount % intarval == 1) {
@@ -283,7 +373,7 @@ function draw() {
 
 class Block {
   constructor() {
-    this.sizeX = random(50, 300);
+    this.sizeX = random(50, 100);
     this.sizeY = 400;
     this.posX = width;
     this.posY = random(500, 600);
