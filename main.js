@@ -462,7 +462,7 @@ function preload() {
     //音楽の読み込み
   
     song1=createAudio('Short_8Bit_01.mp3');
-    song2=createAudio('ゆったりお散歩2-1.mp3');
+    song2=createAudio('ゆったりお散歩.mp3');
     song3=createAudio('選択2.mp3');
     song4=createAudio('ファニージャンプ.mp3');
 }
