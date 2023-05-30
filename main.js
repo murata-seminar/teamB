@@ -23,14 +23,21 @@ let angle = 0;
 let beachImg;
 // 森背景の関数
 let forestImg;
-let back_states = "";
+let back_states = "sabaku";
 
 // スタート画面の描画
 function drawStartScreen() {
   background(0);
+  if(back_states == "sabaku"){
+    image(sabakuImg, 400, 300, 800, 600);
+  }else if(back_states == "sea"){
+    image(beachImg, 400, 300, 800, 600);
+  }else if(back_states == "forest"){
+    image(forestImg, 400, 300, 800, 600);
+  }
   textAlign(CENTER);
   fill(255);
-  textSize(32);
+  textSize(48);
   text("Animal Run", width / 2, height / 2);
   // Startボタンの四角の図形を描画
   stroke(255);
@@ -87,16 +94,36 @@ function drawStartScreen() {
   fill(255);
   textSize(20);
   text("森", 200, 450);
-  imageMode(CENTER);
-  image(playerImages[currentImageIndex], 600, 400, 80, 60);
+  //現在選択中の背景
+  if(back_states == "sabaku"){
+    textSize(12);
+    text('現在のステージ：砂漠', 80, 300);
+    image(sabakuImg, 80, 350, 80, 60);
+  }else if(back_states == "sea"){
+    textSize(12);
+    text('現在のステージ：海', 80, 300);
+    image(beachImg, 80, 350, 80, 60);
+  }else if(back_states == "forest"){
+    textSize(12);
+    text('現在のステージ：森', 80, 300);
+    image(forestImg, 80, 350, 80, 60);
+  }
 }
 
 // ゲームオーバー画面に描画
 function drawGameOverScreen() {
   background(0);
+  if(back_states == "sabaku"){
+    image(sabakuImg, 400, 300, 800, 600);
+  }else if(back_states == "sea"){
+    image(beachImg, 400, 300, 800, 600);
+  }else if(back_states == "forest"){
+    image(forestImg, 400, 300, 800, 600);
+  }
   textAlign(CENTER);
   fill(255);
-  textSize(32);
+  textSize(64);
+  stroke(30);
   text("Game Over", width / 2, height / 2 - 50);
 
   // Retryボタンの四角の図形を描画
@@ -123,7 +150,7 @@ function drawGameOverScreen() {
   text("Menu", 400, 450);
 
   textSize(50);
-  text(record + "m", width / 2, 150);
+  text("記録" + record + "m", width / 2, 150);
 }
 
 
@@ -428,10 +455,11 @@ function preload() {
   sabakuImg = loadImage('sabaku.jpg');
   sabotenImg = loadImage('cactus.png');
   sunImg = loadImage('sun.png');
-  beachImg = loadImage('beach.jpg');
+  beachImg = loadImage('beach.jpeg');
   forestImg = loadImage('forest.jpeg');
   hosiImage = loadImage('hosi.png');
   isiImage = loadImage('isi.png');
+  blockImage = loadImage('block.jpg');
     //音楽の読み込み
   
     song1=createAudio('Short_8Bit_01.mp3');
@@ -508,7 +536,7 @@ function draw() {
         player.x - 40 < items[i].posX + items[i].size &&
         player.y + 30 > items[i].posY &&
         player.y - 30 < items[i].posY + items[i].size
-      ) {
+      ) if (frameCount > 420) {
         if (items[i].type === "obstacle") {
           gameState = "gameover";
         } else if (items[i].type === "powerup") {
@@ -541,8 +569,7 @@ class Block {
   }
 
   display() {
-    fill(0);
-    rect(this.posX, this.posY, this.sizeX, this.sizeY);
+    image(blockImage, this.posX, this.posY, this.sizeX, this.sizeY);
   }
 }
 
