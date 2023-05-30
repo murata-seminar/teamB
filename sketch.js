@@ -159,6 +159,8 @@ function mouseClicked() {
   if (mouseX >= 300 && mouseX <= 500) {
     if (mouseY >= 375 && mouseY <= 425) {
       if (gameState === "start" || gameState === "gameover") {
+        song1.loop();
+        song2.loop();
         song3.play();
         if(back_states == "sabaku" || back_states == "forest" || back_states == "sea") {
         gameState = "game";
@@ -471,8 +473,8 @@ function setup() {
   createCanvas(800, 600); // 800 x 600 ピクセル。今回このサイズでやっていきます
   rectMode(CENTER); //四角形の基準点を中心に変更
   player = createPlayer();
-  song1.loop();
-  song2.loop();
+  //song1.loop();
+  //song2.loop();
 }
 
 function draw() {
