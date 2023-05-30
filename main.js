@@ -123,7 +123,6 @@ function drawGameOverScreen() {
   textAlign(CENTER);
   fill(255);
   textSize(64);
-  stroke(30);
   text("Game Over", width / 2, height / 2 - 50);
 
   // Retryボタンの四角の図形を描画
