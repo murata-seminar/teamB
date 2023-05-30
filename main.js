@@ -121,6 +121,9 @@ function drawGameOverScreen() {
   fill(255);
   textSize(20);
   text("Menu", 400, 450);
+
+  textSize(50);
+  text(record + "m", width / 2, 150);
 }
 
 
