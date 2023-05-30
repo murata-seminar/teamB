@@ -5,6 +5,8 @@ let player;
 let jumpCount = 0;
 let jumpCounts = [1, 3, 2, 2,];
 
+// アイテムの関数
+let items = [];
 // タイマーの関数
 let record;
 let t = 0;
@@ -223,10 +225,10 @@ function applyGravity(entity) {
 }
 
 // ジャンプ
-function applyJump(entity) {
+function applyJump(entity, n) {
   const maxJumpCount = jumpCounts[currentImageIndex]; // 現在の画像インデックスに対応する連続ジャンプ可能回数を取得
   if (jumpCount < maxJumpCount) { // 連続ジャンプ可能回数未満の場合のみジャンプを適用
-    entity.vy = -5;
+    entity.vy = n;
     entity.jumping = true; // ジャンプ中フラグをtrueに設定
     entity.rotation = 0; // 回転角度をリセット
     jumpCount++; // 連続ジャンプ回数を増やす
@@ -297,7 +299,7 @@ function resetGame() {
 // マウスでジャンプ
 function mousePressed() {
   if (gameState === "game") {
-    applyJump(player);
+    applyJump(player, -5);
   }
 }
 
@@ -338,6 +340,8 @@ function preload() {
   sabakuImg = loadImage('sabaku.jpg');
   sabotenImg = loadImage('cactus.png');
   sunImg = loadImage('sun.png');
+  hosiImage = loadImage('hosi.png');
+  isiImage = loadImage('isi.png');
 }
 
 function setup() {
@@ -346,7 +350,28 @@ function setup() {
   player = createPlayer();
 }
 
+class Item {
+  constructor() {
+    this.size = 30;
+    this.posX = width;
+    this.posY = random(height - this.size);
+    this.velocity = -3;
+    this.type = random(["obstacle", "powerup"]); // "obstacle"：ゲームオーバーになるアイテム, "powerup"：ジャンプ力が上がるアイテム
+  }
 
+  move() {
+    this.posX += this.velocity;
+  }
+
+  display() {
+    imageMode(CENTER);
+    if (this.type === "obstacle") {
+      image(isiImage, this.posX, this.posY, this.size, this.size);
+    } else if (this.type === "powerup") {
+      image(hosiImage, this.posX, this.posY, this.size, this.size);
+    }
+}
+}
 
 function draw() {
   sabaku();
@@ -376,6 +401,39 @@ function draw() {
     for (let i = 0; i < blocks.length; i++) {
       blocks[i].move();
       blocks[i].display();
+    }
+    if (frameCount % 120 === 0) { // 2秒ごとにアイテムを追加
+      items.push(new Item());
+    }
+
+    // アイテムの削除
+    for (let i = items.length - 1; i >= 0; i--) {
+      if (items[i].posX < -items[i].size) {
+        items.splice(i, 1);
+      }
+    }
+
+    // アイテムの移動と描画
+    for (let i = 0; i < items.length; i++) {
+      items[i].move();
+      items[i].display();
+
+      // プレイヤーとの当たり判定
+      if (
+        player.x + 40 > items[i].posX &&
+        player.x - 40 < items[i].posX + items[i].size &&
+        player.y + 30 > items[i].posY &&
+        player.y - 30 < items[i].posY + items[i].size
+      ) {
+        if (items[i].type === "obstacle") {
+          gameState = "gameover";
+        } else if (items[i].type === "powerup") {
+          jumpCount = 0;
+          applyJump(player, -7);
+          jumpCount = 0;
+        }
+        items.splice(i, 1); // アイテムを削除
+      }
     }
   } else if (gameState === "gameover") {
     drawGameOverScreen();
