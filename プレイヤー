@@ -10,6 +10,7 @@ let items = [];
 // タイマーの関数
 let record;
 let t = 0;
+let countDown = 6;
 // 状況の関数
 let gameState = "start";
 // ブロックの関数
@@ -39,9 +40,24 @@ function drawStartScreen() {
   textSize(24);
   textAlign(CENTER, CENTER);
   text("Start", 400, 400);
-
+  //現在選択している動物を描画
   imageMode(CENTER);
   image(playerImages[currentImageIndex], 600, 400, 80, 60);
+  textSize(16);
+  text("Click to select animal\n↓", 600, 340);
+  if(currentImageIndex === 0) {
+    textSize(12);
+    text("馬\n連続ジャンプ可能回数：1回\nジャンプ力：高い", 600, 460);
+  }else if(currentImageIndex === 1) {
+    textSize(12);
+    text("亀\n連続ジャンプ可能回数：3回\nジャンプ力：低い", 600, 460);
+  }else if(currentImageIndex === 2) {
+    textSize(12);
+    text("チーター\n連続ジャンプ可能回数：2回\nジャンプ力：とても高い", 600, 460);
+  }else if(currentImageIndex === 3) {
+    textSize(12);
+    text("猫\n連続ジャンプ可能回数：2回\nジャンプ力：普通", 600, 460);
+  }
 }
 
 // ゲームオーバー画面に描画
@@ -268,27 +284,7 @@ function drawPlayer(entity) {
 }
 
 // タイマー
-function timer(entity) {
-  if(frameCount < 420) {
-    entity.loading = true;
-    record = 6 - Math.floor(frameCount / 60);
-    noStroke();
-    fill(0);
-    textSize(100);
-    textAlign(CENTER, CENTER);
-    text(record, 50, 50);
-  } else {
-    entity.loading = false;
-  record = Math.floor(t / 60);
 
-  noStroke();
-  fill(0);
-  textSize(100);
-  textAlign(CENTER, CENTER);
-  text(record, 50, 50);
-  t += 1
-  }
-}
 
 // リセット
 function resetGame() {
